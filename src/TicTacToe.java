@@ -25,10 +25,11 @@ public class TicTacToe implements ActionListener {
     public TicTacToe(){
         
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(800,800);
+    frame.setSize(700,700);
     frame.getContentPane().setBackground(new Color(50,50,50));
     frame.setLayout(new BorderLayout());
     frame.setVisible(true);
+    frame.setLocationRelativeTo(null);
     
     textField.setBackground(new Color(25,25,25));
     textField.setForeground(new Color(25,255,0));
@@ -111,7 +112,7 @@ public class TicTacToe implements ActionListener {
                 System.exit(0);
             }
         }
-        else if(checkDraw()){
+        else if(checkDraw()){ 
             JOptionPane pane = new JOptionPane();
             int dialogResult = JOptionPane.showConfirmDialog(pane, "Draw, Game Over.  Play Again?"
                     ,"Game Over.",JOptionPane.YES_NO_OPTION);
