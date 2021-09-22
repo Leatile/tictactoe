@@ -1,22 +1,29 @@
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javafx.application.Application;
-import javafx.stage.Stage;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
-public class TicTacToe extends Application implements ActionListener{
+public class TicTacToe implements ActionListener {
     
     Random random = new Random();
-    JFrame frame = new JFrame();
+    JFrame frame = new JFrame("Tic Tac Toe");
     JPanel title_panel = new JPanel();
     JPanel button_panel = new JPanel();
     JLabel textField = new JLabel();
     JButton[] buttons = new JButton[9];
-    boolean player1_turn;
+    boolean playerX_turn;
+    char playerMark = 'X';
     
-public TicTacToe(){
-    
+    public TicTacToe(){
+        
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(800,800);
     frame.getContentPane().setBackground(new Color(50,50,50));
@@ -36,211 +43,196 @@ public TicTacToe(){
     button_panel.setLayout(new GridLayout(3,3));
     button_panel.setBackground(new Color(150,150,150));
     
-    for(int i=0;i<9;i++){
-        buttons[i] = new JButton();
-        button_panel.add(buttons[i]);
-        buttons[i].setFont(new Font("MV Boli",Font.BOLD,120));
-        buttons[i].setFocusable(false);
-        buttons[i].addActionListener(this);
-    }
-    
     title_panel.add(textField);
     frame.add(title_panel,BorderLayout.NORTH);
     frame.add(button_panel);
     
     firstTurn();
+    createButtons();
         
     }
+    
 
     @Override
     public void actionPerformed(ActionEvent e) {
         for(int i=0;i<9;i++){
             if(e.getSource() == buttons[i]){
-                if(player1_turn){
-                    if(buttons[i].getText() == ""){
+                if(playerX_turn && playerMark == 'X'){
+                    if(buttons[i].getText() == "-"){
                         buttons[i].setForeground(new Color(255,0,0));
                         buttons[i].setText("X");
-                        player1_turn = false;
-                        textField.setText("O turn");
-                        check();
+                        playerX_turn = false;
+                        playerMark = 'O';
+                        textField.setText("O turn");   
                     }
                 }
                 else{
-                     if(buttons[i].getText() == ""){
+                     if(buttons[i].getText() == "-"){
                         buttons[i].setForeground(new Color(0,0,255));
                         buttons[i].setText("O");
-                        player1_turn = true;
-                        textField.setText("X turn");
-                        check();
+                        playerX_turn = true;
+                        playerMark = 'X';
+                        textField.setText("X turn");      
                 }
             }
+                displayWinner();
+        }
+     }
+   }
+    
+    public void createButtons(){
+    for(int i=0;i<9;i++){
+        buttons[i] = new JButton();
+        button_panel.add(buttons[i]);
+        buttons[i].setText("-");
+        buttons[i].setBackground(new Color(220,220,255));
+        buttons[i].setForeground(new Color(220,220,255));
+        buttons[i].setFont(new Font("MV Boli",Font.BOLD,120));
+        buttons[i].setFocusable(false);
+        buttons[i].addActionListener(this);
         }
     }
-  }
+    
+    public void displayWinner(){
+        if(checkWinner() == true){
+            
+            if(playerMark == 'X') playerMark = 'O';
+            else playerMark = 'X';
+            
+            JOptionPane pane = new JOptionPane();
+            int dialogResult = JOptionPane.showConfirmDialog(pane, "Game Over  ("+playerMark+ 
+                    ")  Won. Play Again?","Game Over.",JOptionPane.YES_NO_OPTION);
+            
+            if(dialogResult == JOptionPane.YES_OPTION){
+                JOptionPane.showMessageDialog(null, "Good luck!");
+                resetTheGame();
+            }
+            else {
+                System.exit(0);
+            }
+        }
+        else if(checkDraw()){
+            JOptionPane pane = new JOptionPane();
+            int dialogResult = JOptionPane.showConfirmDialog(pane, "Draw, Game Over.  Play Again?"
+                    ,"Game Over.",JOptionPane.YES_NO_OPTION);
+            
+            if(dialogResult == JOptionPane.YES_OPTION){
+                JOptionPane.showMessageDialog(null, "Good luck!");
+                resetTheGame();
+                }
+            else{ 
+                System.exit(0);
+            } 
+        }  
+    }
     
     public void firstTurn(){
-        
-        try{
-            Thread.sleep(2000);
-        } catch(InterruptedException e){
-            e.printStackTrace();
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        if(random.nextInt(2)==0){
+            playerX_turn = true;
+            textField.setText("X turn");
+        } else{
+            playerX_turn = false;
+            textField.setText("O turn");
         }
-        
-        if(random.nextInt(2) == 0){
-        player1_turn = true;
-        textField.setText("X turn");
-        
-    } else{
-            if(random.nextInt(2) == 0){
-        player1_turn = false;
-        textField.setText("O turn");
-            }   
-        }
+
     }
     
-    public void check(){
-        
-        //Check for X
-        
-        if("X".equals(buttons[0].getText()) && buttons[0].getText().equals(buttons[1].getText()) && 
-                buttons[0].getText().equals(buttons[2].getText())){
-            xWins(0,1,2);
-        }
-        
-        if("X".equals(buttons[3].getText()) && buttons[3].getText().equals(buttons[4].getText()) && 
-                buttons[3].getText().equals(buttons[5].getText())){
-            xWins(3,4,5);
-        }
-        
-        if("X".equals(buttons[6].getText()) && buttons[6].getText().equals(buttons[7].getText()) && 
-                buttons[6].getText().equals(buttons[8].getText())){
-            xWins(6,7,8);
-        }
-        
-        if("X".equals(buttons[0].getText()) && buttons[0].getText().equals(buttons[3].getText()) && 
-                buttons[0].getText().equals(buttons[6].getText())){
-            xWins(0,3,6);
-        }
-        
-        if("X".equals(buttons[1].getText()) && buttons[1].getText().equals(buttons[4].getText()) && 
-                buttons[1].getText().equals(buttons[7].getText())){
-            xWins(1,4,7);
-        }
-        
-        if("X".equals(buttons[2].getText()) && buttons[2].getText().equals(buttons[5].getText()) && 
-                buttons[2].getText().equals(buttons[8].getText())){
-            xWins(2,5,8);
-        }
-        
-        if("X".equals(buttons[0].getText()) && buttons[0].getText().equals(buttons[4].getText()) && 
-                buttons[0].getText().equals(buttons[8].getText())){
-            xWins(0,4,8);
-        }
-        
-        if("X".equals(buttons[2].getText()) && buttons[2].getText().equals(buttons[4].getText()) && 
-                buttons[2].getText().equals(buttons[6].getText())){
-            xWins(2,4,6);
-        }
-        
-        //Check for O
-        
-        if("O".equals(buttons[0].getText()) && buttons[0].getText().equals(buttons[1].getText()) && 
-                buttons[0].getText().equals(buttons[2].getText())){
-            oWins(0,1,2);
-        }
-        
-        if("O".equals(buttons[3].getText()) && buttons[3].getText().equals(buttons[4].getText()) && 
-                buttons[3].getText().equals(buttons[5].getText())){
-            oWins(3,4,5);
-        }
-        
-        if("O".equals(buttons[6].getText()) && buttons[6].getText().equals(buttons[7].getText()) && 
-                buttons[6].getText().equals(buttons[8].getText())){
-            oWins(6,7,8);
-        }
-        
-        if("O".equals(buttons[0].getText()) && buttons[0].getText().equals(buttons[3].getText()) && 
-                buttons[0].getText().equals(buttons[6].getText())){
-            oWins(0,3,6);
-        }
-        
-        if("O".equals(buttons[1].getText()) && buttons[1].getText().equals(buttons[4].getText()) && 
-                buttons[1].getText().equals(buttons[7].getText())){
-            oWins(1,4,7);
-        }
-        
-        if("O".equals(buttons[2].getText()) && buttons[2].getText().equals(buttons[5].getText()) && 
-                buttons[2].getText().equals(buttons[8].getText())){
-            oWins(2,5,8);
-        }
-        
-        if("O".equals(buttons[0].getText()) && buttons[0].getText().equals(buttons[4].getText()) && 
-                buttons[0].getText().equals(buttons[8].getText())){
-            oWins(0,4,8);
-        }
-        
-        if("O".equals(buttons[2].getText()) && buttons[2].getText().equals(buttons[4].getText()) && 
-                buttons[2].getText().equals(buttons[6].getText())){
-            oWins(2,4,6);
+    public void resetTheGame(){
+        for(int i=0; i<9; i++){
+            buttons[i].setText("-");
+            buttons[i].setBackground(new Color(220,220,255));
+            buttons[i].setForeground(new Color(220,220,255));
+            buttons[i].setText("-");
         }
         
     }
     
-    public void xWins(int a, int b, int c){
-        buttons[a].setBackground(Color.GREEN);
-        buttons[b].setBackground(Color.GREEN);
-        buttons[c].setBackground(Color.GREEN);
-        
-        for(int i=0;i<9;i++){
-            buttons[i].setEnabled(false);
+    public boolean checkDraw(){
+        boolean full = true;
+        for(int i=0; i<9; i++){
+            if(buttons[i].getText().charAt(0) == '-'){
+                  full = false;
+            } 
         }
-        textField.setText("X won");
+        return full;  
+    }
+    
+    public boolean checkWinner(){  
         
-        JOptionPane pane = new JOptionPane();
-        int result = JOptionPane.showConfirmDialog(pane, "Game Over, X Won. Would you like to play again?."
-        + JOptionPane.YES_NO_OPTION);
-        
-        if(result == JOptionPane.YES_OPTION){
-            JOptionPane.showMessageDialog(null, "Good luck!");
-            Main.main(null);
+        return checkRows() == true || checkColumns() == true || checkDiagonals() == true; 
+    }
+    
+    public boolean checkRows(){
+        int i = 0;
+        for(int j=0; j<3; j++){
+            if(buttons[i].getText().equals(buttons[i+1].getText()) && 
+                    buttons[i].getText().equals(buttons[i+2].getText())
+                    && buttons[i].getText().charAt(0) != '-'){
+                
+                
+                 buttons[i].setBackground(Color.GREEN);
+                 buttons[i+1].setBackground(Color.GREEN);
+                 buttons[i+2].setBackground(Color.GREEN );
             
-        }else{
-            JOptionPane.showMessageDialog(null, "Thanks for playing");
-            System.exit(0);
+                 
+                return true;
+            }
+            i = i+3;
         }
-        
+        return false;
     }
     
-    public void oWins(int a, int b, int c){
-        buttons[a].setBackground(Color.GREEN);
-        buttons[b].setBackground(Color.GREEN);
-        buttons[c].setBackground(Color.GREEN);
-        
-        for(int i=0;i<9;i++){
-            buttons[i].setEnabled(false);
+    public boolean checkColumns(){
+       int i = 0;
+        for(int j=0; j<3; j++){
+            if(buttons[i].getText().equals(buttons[i+3].getText()) && 
+                    buttons[i].getText().equals(buttons[i+6].getText())
+                    && buttons[i].getText().charAt(0) != '-'){
+                
+                buttons[i].setBackground(Color.GREEN);
+                 buttons[i+3].setBackground(Color.GREEN);
+                 buttons[i+6].setBackground(Color.GREEN );
+                 
+                 return true;
+                
+            }
+            i++;
         }
-        textField.setText("O won");
-        
-        JOptionPane pane = new JOptionPane();
-        int result = JOptionPane.showConfirmDialog(pane, "Game Over, O Won. Would you like to play again?."
-        + JOptionPane.YES_NO_OPTION);
-        
-        if(result == JOptionPane.YES_OPTION){
-            JOptionPane.showMessageDialog(null, "Good luck!");
-            Main.main(null);
-            
-        }else{
-            JOptionPane.showMessageDialog(null, "Thanks for playing");
-            System.exit(0);
-        }
+        return false;
+    }
+    
+    public boolean checkDiagonals(){
+            if(buttons[0].getText().equals(buttons[4].getText()) && 
+                    buttons[0].getText().equals(buttons[8].getText())
+                    && buttons[0].getText().charAt(0) != '-'){
+                
+                    buttons[0].setBackground(Color.GREEN);
+                 buttons[4].setBackground(Color.GREEN);
+                 buttons[8].setBackground(Color.GREEN );
+                 
+                return true;
+            }
+            else if(buttons[2].getText().equals(buttons[4].getText()) && 
+                    buttons[2].getText().equals(buttons[6].getText())
+                    && buttons[2].getText().charAt(0) != '-'){
+                
+                 buttons[2].setBackground(Color.GREEN);
+                 buttons[4].setBackground(Color.GREEN);
+                 buttons[6].setBackground(Color.GREEN );
+                 
+                return true;
+            }
+            else{
+              return false;  
+            }  
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    
-    
-    
 }
+    
+
